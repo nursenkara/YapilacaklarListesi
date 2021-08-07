@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YAPILACAKLAR LİSTEM</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body class="container pt-3">
+    <div class="card" id="todoEl">
+      <div class="card-header">
+        Nur'un Yapılacaklar Listesi
+        <button class="btn btn-success btn-sm float-end" @click="yeni">
+          Yeni Ekle
+        </button>
+      </div>
+      <div class="card-body">
+        <table class="w-100">
+          <tr v-for="todo in todos">
+            <td>
+              <input
+                type="checkbox"
+                v-model="todo.completed"
+                @click="tamamlandi(todo.id)"
+              />
+            </td>
+            <td width="90%">
+              <del v-if="todo.completed"> {{todo.title}} </del>
+              <span v-else> {{todo.title}} </span>
+            </td>
+            <td>
+              <button
+                class="btn btn-primary btn-sm"
+                @click="duzenle(todo.id, todo.title)"
+              >
+                Düzenle
+              </button>
+            </td>
+            <td>
+              <button class="btn btn-danger btn-sm" @click="sil(todo.id)">
+                Sil
+              </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <script>
+      var todoVue = new Vue({
+        el: "#todoEl",
+        data: {
+          todos: ls("todos"),
+        },
+        methods: {
+          yeni() {
+            let todoTitle = prompt("Yeni yapılacak", "");
+            if (!todoTitle) {
+              return;
+            }
+            const todo = {
+              id: "TodoID_" + new Date() * 1,
+              title: todoTitle,
+              time: new Date(),
+              completed: false,
+            };
+            this.todos.push(todo);
+            ls("todos", this.todos);
+          },
+          duzenle(todoId, todoTitle) {
+            todoTitle = prompt("Yeni adı", todoTitle);
+            const index = this.todos
+              .map((x) => {
+                return x.id;
+              })
+              .indexOf(todoId);
+            if (todoTitle) {
+              this.todos[index].title = todoTitle;
+            }
+            ls("todos", this.todos);
+          },
+          sil(todoId) {
+            if (confirm("Emin misiniz?")) {
+              const index = this.todos
+                .map((x) => {
+                  return x.id;
+                })
+                .indexOf(todoId);
+              this.todos.splice(index, 1);
+              ls("todos", this.todos);
+            }
+          },
+          tamamlandi(todoId) {
+            const index = this.todos
+              .map((x) => {
+                return x.id;
+              })
+              .indexOf(todoId);
+            this.todos[index].completed = !this.todos[index].completed;
+            ls("todos", this.todos);
+          },
+        },
+      });
+
+      function ls(key, obj) {
+        if (obj) {
+          localStorage.setItem(key, JSON.stringify(obj));
+        }
+        if (localStorage.getItem(key) != null) {
+          return JSON.parse(localStorage.getItem(key));
+        } else {
+          return [];
+        }
+      }
+    </script>
+  </body>
+</html>
